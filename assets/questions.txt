@@ -1,0 +1,22 @@
+What do you want to do?
+    View all Departments
+      (Dept name, dept id)
+    View all Roles
+      (job title, role id, depart name, salary)
+    View all Employees
+      (employee first and last name, job title, 
+        dept, salary, and manager name)
+    Add Department
+        Enter Department's name
+    Add Role
+        Enter Role's name
+        Enter Role's salary
+        Enter Role's department
+    Add Employee
+        Enter Employee's first name
+        Enter Employee's last name
+        Enter Employee's role
+        Enter Employee's manager
+    Update Employee Role    
+        Select Employee from list
+        Enter Employee's new role
