@@ -1,4 +1,6 @@
 const express = require('express');
+const inquirer = require('inquirer');
+const ct = require('console.table');
 // Import and require mysql2
 const mysql = require('mysql2');
 
@@ -17,24 +19,24 @@ const db = mysql.createConnection(
     user: 'root',
     // MySQL password
     password: 'MySQLPass123!',
-    database: 'movies_db'
+    database: 'personnel_db'
   },
-  console.log(`Connected to the movies_db database.`)
+  console.log(`Connected to the ${database} database.`)
 );
 
 // Hardcoded query: DELETE FROM movie_names WHERE id = 3;
 
-db.query(`DELETE FROM movie_names WHERE id = ?`, 3, (err, result) => {
-  if (err) {
-    console.log(err);
-  }
-  console.log(result);
-});
+// db.query(`DELETE FROM movie_names WHERE id = ?`, 3, (err, result) => {
+//   if (err) {
+//     console.log(err);
+//   }
+//   console.log(result);
+// });
 
 // Query database
-db.query('SELECT * FROM movie_names', function (err, results) {
-  console.log(results);
-});
+// db.query('SELECT * FROM movie_names', function (err, results) {
+//   console.log(results);
+// });
 
 // Default response for any other request (Not Found)
 app.use((req, res) => {

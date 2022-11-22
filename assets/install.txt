@@ -1,0 +1,5 @@
+npm init -y
+npm i inquirer@8.2.4
+npm i console.table --save
+npm i nodemon
+npm run start or npx nodemon
