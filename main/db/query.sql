@@ -37,14 +37,12 @@ ORDER BY emp.id  ;
 --   lising id, name, title, salary, 
 --        department and manager
 SELECT 
-  mgr.id ,
-  mgr.first_name,
-  mgr.last_name,
+  mgr.id,
+  CONCAT (mgr.first_name, " ", mgr.last_name) AS manager,
   role.title_long AS title,
-  role.salary,
+  CONCAT ("$ ", FORMAT (role.salary, 2)) AS salary,
   dept.name_long AS department,
-  mgr2.first_name,
-  mgr2.last_name,
+  CONCAT (mgr2.first_name, " ", mgr2.last_name) AS higher_exec
 FROM employee emp
 JOIN employee mgr
   ON mgr.id = emp.manager_id
@@ -54,8 +52,11 @@ JOIN department dept
   ON dept.id = role.department_id
 LEFT JOIN employee mgr2
   ON mgr2.id = mgr.manager_id
-ORDER BY mgr.id 
-WHERE ;
+GROUP BY mgr.id
+ORDER BY mgr.manager_id;
+-- null manager_id means they do not have a manager (should only be 1)
+WHERE emp.manager_id != NULL
+
 
 
 -- Personnel Budget by Department
