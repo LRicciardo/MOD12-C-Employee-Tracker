@@ -166,43 +166,36 @@ const addPrompt = async () => {
   },
   ]; 
   const { action } = await inquirer.prompt(query)
-  // await inquirer
-  //   .prompt(query)
-    // .then((answers) => {
-      console.log("inside addPrompt .then");
-      console.log(action);
-      switch (action) {
-        case "Department":
-          addDepartment();
-          break;
-        case "Role":
-          addRole();
-          break;
-        case "Employee":
-          addEmployee();
-          break;
-        case "QUIT ADD":
-          console.log("Return to main query");
-          employeeTracker();
-          break;
-        default:
-          console.log("Default addPrompt Task")
-          break;
-      }
-    // })
-    // .catch((err) =>
-    //   err ? console.log(err) : console.log(`Successful addPrompt`)
-    // );
+  // console.log("inside addPrompt .then");
+  // console.log(action);
+  switch (action) {
+    case "Department":
+      addDepartment();
+      break;
+    case "Role":
+      addRole();
+      break;
+    case "Employee":
+      addEmployee();
+      break;
+    case "QUIT ADD":
+      console.log("Return to main query");
+      employeeTracker();
+      break;
+    default:
+      console.log("Default addPrompt Task")
+      break;
+  };
 };
 
 const addDepartment = async () => {
-  console.log("inside addDepartment");
+  // console.log("inside addDepartment");
   const query = [
   {
     type: "input",
     name: "longName",
     message: "Enter Department name (up to 30 characters)=>",
-    validate: (longName) => {
+    validate(longName) {
       const pass = longName.match(/[a-zA-Z0-9:-\s]{1,30}/g);
       if (pass) {
         return true;
@@ -214,7 +207,7 @@ const addDepartment = async () => {
     type: "input",
     name: "shortName",
     message: "Enter Department abbreviated name (up to 10 characters)=>",
-    validate: (shortName) => {
+    validate(shortName) {
       const pass = shortName.match(/[a-zA-Z0-9:-\s]{1,10}/g);
       if (pass) {
         return true;
@@ -224,28 +217,24 @@ const addDepartment = async () => {
   },
   ]; 
   const answers = await inquirer.prompt(query);
-    const sqlResults = await connex2db.sqlAddDept(answers);
-     console.log(sqlResults);
-     console.table("Department Added",answers);
-    addPrompt();
+  const sqlResults = await connex2db.sqlAddDept(answers);
+  //  console.log(sqlResults);
+  console.table("== Department Added ==", answers);
+  console.table(sqlResults[0]);
+  addPrompt();
 };
 
 const addRole = async () => {
   // console.log("inside addRole");
 
-  const cleanSalary = (inputSalary) => {
-    return Math.floor(inputSalary).replace(/\D/g,'')
-  };
-  
   const [choicesDept] = await connex2db.sqlDeptChoices();
-  
   
   const query = [
   {
     type: "input",
     name: "longTitle",
     message: "Enter title (up to 30 characters)=>",
-    validate: (longTitle) => {
+    validate(longTitle) {
       const pass = longTitle.match(/[a-zA-Z0-9:-\s]{1,30}/g);
       if (pass) {
         return true;
@@ -257,7 +246,7 @@ const addRole = async () => {
     type: "input",
     name: "shortTitle",
     message: "Enter abbreviated title (up to 10 characters)=>",
-    validate: (shortTitle) => {
+    validate(shortTitle) {
       const pass = shortTitle.match(/[a-zA-Z0-9:-\s]{1,10}/g);
       if (pass) {
         return true;
@@ -266,7 +255,7 @@ const addRole = async () => {
     },
   },
   {
-    type: "number",
+    type: "input",
     name: "salary",
     message: "Enter salary=>",
     validate: (salary) => {
@@ -286,95 +275,23 @@ const addRole = async () => {
   ];
   const answers = await inquirer.prompt(query);
   const sqlResults = await connex2db.sqlAddRole(answers);
-   console.log(sqlResults);
-   addPrompt();
-  // await inquirer
-  //   .prompt(query)
-  //   .then((answers) => {
-  //     const sqlInsert = {
-  //       // table: "role",
-  //       // fields: ["title_long", "title_short", "salary", "department_id"],
-  //       params: [answers.longTitle, answers.shortTitle, cleanSalary(answers.salary), answers.deptId]
-  //     };
-  //   const cmdInsert = `INSERT INTO role ( "title_long", "title_short", "salary", "department_id" ) VALUES ( ?, ?, ?, ? )`;  
-  //   // we havent async call to our DB 
-  //   sqlCall(cmdInsert, sqlInsert.params)
-  //     .then(data => {
-  //       console.log(data)
-  //       addPrompt();
-  //     })
-  //     .catch(err => {
-  //       console.log(err);
-  //     })
-  //     // connex2sql.query(cmdInsert, sqlInsert.params,
-  //     //   (err,res) => {
-  //     //     console.log("inside sql query");
-  //     //     console.log(err);
-  //     //     console.log(res);
-  //     //     if (err){
-  //     //       res.status(500).json({error: err.message});
-  //     //       // return;
-  //     //     }
-  //     //     // return res;
-  //     //     return `Role ${answers.longTitle} has been added`;
-  //     //   });
-  //   })
-  //   .catch((err) =>
-  //     err ? console.log(err) : console.log(`Successful addRole`)
-  //   );
+  console.table("== Role Added ==", answers);
+  console.table(sqlResults[0]);
+  addPrompt();
 };
 
 const addEmployee = async () => {
-  console.log("inside addEmployee");
+  // console.log("inside addEmployee");
 
-  const roleChoices = () => { 
-    
-    const cmdView = `SELECT 
-    role.id AS value,
-    role.title_long AS name,
-  FROM role;`;     
-    const roleArr = connex2sql.query(cmdView,
-      (err,res) => {
-        if (err) {
-          res.status(500).json({error: err});
-          return null;
-        };
-        console.log(res);
-        return res;
-      });
-      return roleArr[0];
-  };
-
-  const mgrChoices = () => { 
-    
-    const cmdView = `SELECT 
-    mgr.id as value,
-    CONCAT (mgr.first_name, " ", mgr.last_name) AS name,
-  FROM employee emp
-  JOIN employee mgr
-    ON mgr.id = emp.manager_id
-  LEFT JOIN employee mgr2
-    ON mgr2.id = mgr.manager_id
-  GROUP BY mgr.id
-  ORDER BY mgr.manager_id;`;     
-    const roleArr = connex2sql.query(cmdView,
-      (err,res) => {
-        if (err) {
-          res.status(500).json({error: err});
-          return null;
-        };
-        console.log(res);
-        return res;
-      });
-      return roleArr[0];
-  };
+  const [choicesRole] = await connex2db.sqlRoleChoices();
+  const [choicesMgr] = await connex2db.sqlMgrChoices();
 
   const query = [
   {
     type: "input",
     name: "firstName",
     message: "Enter Employee first name (up to 30 characters)=>",
-    validate: (firstName) => {
+    validate(firstName) {
       const pass = firstName.match(/[a-zA-Z\s]{1,30}/g);
       if (pass) {
         return true;
@@ -386,7 +303,7 @@ const addEmployee = async () => {
     type: "input",
     name: "lastName",
     message: "Enter Employee last name (up to 30 characters))=>",
-    validate: (lastName) => {
+    validate(lastName) {
       const pass = lastName.match(/[a-zA-Z.-\s]{1,30}/g);
       if (pass) {
         return true;
@@ -398,42 +315,20 @@ const addEmployee = async () => {
     type: "list",
     name: "roleId",
     message: "Select Role=>",
-    choices: roleChoices(),
+    choices: choicesRole,
   },
   {
     type: "list",
     name: "mgrId",
     message: "Select Manager=>",
-    choices: mgrChoices(),
+    choices: choicesMgr,
   },
-  ];  
-  await inquirer
-    .prompt(query)
-    .then((answers) => {
-      const sqlInsert = {
-        table: "role",
-        fields: ["first_name", "last_name","role_id", "manager_id"],
-        params: [answers.firstName, answers.lastName, roleId, answers.mgrId]
-      };
-    const cmdInsert = `INSERT INTO ${sqlInsert.table} ( ${sqlInsert.fields} ) VALUES ( ?, ?, ?, ? )`;   
-      sqlCall(cmdInsert, sqlInsert.params);
-      // connex2sql.query(cmdInsert, sqlInsert.params,
-      //   (err,res) => {
-      //     console.log("inside sql query");
-      //     console.log(err);
-      //     console.log(res);
-      //     if (err){
-      //       res.status(500).json({error: err.message});
-      //       // return;
-      //     }
-      //     // return res;
-      //     return `Role ${answers.longTitle} has been added`;
-      //   });
-      addPrompt();
-    })
-    .catch((err) =>
-      err ? console.log(err) : console.log(`Successful addDepartment`)
-    );
+  ];
+  const answers = await inquirer.prompt(query);
+  const sqlResults = await connex2db.sqlAddEmployee(answers);
+  console.table("== Employee Added ==", answers);
+  console.table(sqlResults[0]);
+  addPrompt();
 };
 
 // UPDATE ##################################
@@ -449,38 +344,279 @@ const updatePrompt = async () => {
     // choices: ["Department", "DONE"]
   },
   ]; 
-  const { action } = await inquirer.prompt(query)
+  const { action } = await inquirer.prompt(query);
 
-      switch (action) {
-        case "Department":
-          updateDepartment();
-          break;
-        case "Role":
-          updateRole();
-          break;
-        case "Employee":
-          updateEmployee();
-          break;
-        case "QUIT UPDATE":
-          console.log("Return to main query");
-          employeeTracker();
-          break;
-        default:
-          console.log("Default updatePrompt Task")
-          break;
+  switch (action) {
+    case "Department":
+      updateDepartment();
+      break;
+    case "Role":
+      updateRole();
+      break;
+    case "Employee":
+      updateEmployee();
+      break;
+    case "QUIT UPDATE":
+      console.log("Return to main query");
+      employeeTracker();
+      break;
+    default:
+      console.log("Default updatePrompt Task")
+      break;
+  }
+};
+ 
+const updateDepartment = async () => {
+  console.log("inside updateDepartment");
+
+  const [choicesDept] = await connex2db.sqlDeptChoices();
+
+  const query = [
+  {
+    type: "list",
+    name: "deptId",
+    message: "Select Department to UPDATE=>",
+    choices: choicesDept,
+  },
+  ];
+  const answers = await inquirer.prompt(query);
+   // get single dept by id
+  const oneData = await connex2db.sqlOneDept(answers);
+  const preChange = oneData[0][0];
+  // console.log(oneDeptData[0][0]);
+
+  const query2 = [
+  {
+    type: "input",
+    name: "longName",
+    message: "Enter Department name (up to 30 characters)=>",
+    default() {
+      return preChange.name_long
+    },
+    validate(longName) {
+      const pass = longName.match(/[a-zA-Z0-9:-\s]{1,30}/g);
+      if (pass) {
+        return true;
       }
+      return "The official Department name should be 1 to 30 characters long.";
+    },
+  },
+  {
+    type: "input",
+    name: "shortName",
+    message: "Enter Department abbreviated name (up to 10 characters)=>",
+    default() {
+      return preChange.name_short
+    },
+    validate(shortName) {
+      const pass = shortName.match(/[a-zA-Z0-9:-\s]{1,10}/g);
+      if (pass) {
+        return true;
+      }
+      return "The abbreviated Department name should be 1 to 10 characters long.";
+    },
+  },
+  ]; 
+  const answers2 = await inquirer.prompt(query2);
+  // console.log(answers2);
+  const params = {
+    deptId: answers.deptId,
+    longName: answers2.longName,
+    shortName: answers2.shortName
+  };
+  // console.log(params);
+  const sqlResults = await connex2db.sqlUpdOneDept(params);
+  console.table("== Department Updated Before ==", preChange);
+  console.table("== Department Updated After ==", params);
+  console.table(sqlResults[0]);
+
+  updatePrompt();
 };
  
-updateDepartment = () => {
-console.log("inside updateDepartment")
-};
- 
-deleteRole = () => {
+const updateRole = async () => {
 console.log("inside updateRole")
+
+const [choicesRole] = await connex2db.sqlRoleChoices();
+
+const query = [
+{
+  type: "list",
+  name: "roleId",
+  message: "Select Role to UPDATE=>",
+  choices: choicesRole,
+},
+];
+const answers = await inquirer.prompt(query);
+ // get single dept by id
+const oneData = await connex2db.sqlOneRole(answers);
+const preChange = oneData[0][0];
+// console.log(oneDeptData[0][0]);
+
+const [choicesDept] = await connex2db.sqlDeptChoices();
+
+const query2 = [
+  {
+    type: "input",
+    name: "longTitle",
+    message: "Enter title (up to 30 characters)=>",
+    default() {
+      return preChange.title_long
+    },
+    validate(longTitle) {
+      const pass = longTitle.match(/[a-zA-Z0-9:-\s]{1,30}/g);
+      if (pass) {
+        return true;
+      }
+      return "The official title should be 1 to 30 characters long.";
+    },
+  },
+  {
+    type: "input",
+    name: "shortTitle",
+    message: "Enter abbreviated title (up to 10 characters)=>",
+    default() {
+      return preChange.title_short
+    },
+    validate(shortTitle) {
+      const pass = shortTitle.match(/[a-zA-Z0-9:-\s]{1,10}/g);
+      if (pass) {
+        return true;
+      }
+      return "The abbreviated title should be 1 to 10 characters long.";
+    },
+  },
+  {
+    type: "input",
+    name: "salary",
+    message: "Enter salary=>",
+    default() {
+      return preChange.salary
+    },
+    validate(salary) {
+      const pass = salary.match(/^\d{1,6}$/g);
+      if (pass) {
+        return true;
+      }
+      return "The a valid whole dollar amount without punctuation.";
+    },
+  },
+  {
+    type: "list",
+    name: "deptId",
+    message: "Select Department=>",
+    default() {
+      return preChange.department_id
+    },
+    choices: choicesDept,
+  },
+]; 
+const answers2 = await inquirer.prompt(query2);
+// console.log(answers2);
+const params = {
+  roleId: answers.roleId,
+  longTitle: answers2.longTitle,
+  shortTitle: answers2.shortTitle,
+  salary: answers2.salary,
+  deptId: answers2.deptId
+};
+// console.log(params);
+const sqlResults = await connex2db.sqlUpdOneRole(params);
+console.table("== Role Updated Before ==", preChange);
+console.table("== Role Updated After ==", params);
+console.table(sqlResults[0]);
+
+updatePrompt();
 };
  
-deleteEmployee = () => {
-console.log("inside updateEmployee")
+const updateEmployee = async () => {
+console.log("inside updateEmployee");
+  // console.log("inside addEmployee");
+
+const [choicesEmp] = await connex2db.sqlEmpChoices();
+
+const query = [
+  {
+    type: "list",
+    name: "empId",
+    message: "Select Employee to UPDATE=>",
+    choices: choicesEmp,
+  },
+  ];
+const answers = await inquirer.prompt(query);
+  // get single dept by id
+const oneData = await connex2db.sqlOneEmp(answers);
+const preChange = oneData[0][0];
+// console.log(oneDeptData[0][0]);
+
+const [choicesRole] = await connex2db.sqlRoleChoices();
+const [choicesMgr] = await connex2db.sqlMgrChoices();
+
+  const query2 = [
+  {
+    type: "input",
+    name: "firstName",
+    message: "Enter Employee first name (up to 30 characters)=>",
+    default() {
+      return preChange.first_name
+    },
+    validate(firstName) {
+      const pass = firstName.match(/[a-zA-Z\s]{1,30}/g);
+      if (pass) {
+        return true;
+      }
+      return "The Employee first name should be 1 to 30 characters long.";
+    },
+  },
+  {
+    type: "input",
+    name: "lastName",
+    message: "Enter Employee last name (up to 30 characters))=>",
+    default() {
+      return preChange.last_name
+    },
+    validate(lastName) {
+      const pass = lastName.match(/[a-zA-Z.-\s]{1,30}/g);
+      if (pass) {
+        return true;
+      }
+      return "The Employee last name should be 1 to 30 characters long.";
+    },
+  },
+  {
+    type: "list",
+    name: "roleId",
+    message: "Select Role=>",
+    default() {
+      return preChange.role_id
+    },
+    choices: choicesRole,
+  },
+  {
+    type: "list",
+    name: "mgrId",
+    message: "Select Manager=>",
+    default() {
+      return preChange.manager_id
+    },
+    choices: choicesMgr,
+  },
+  ];
+  const answers2 = await inquirer.prompt(query2);
+  // console.log(answers2);
+  const params = {
+    empId: answers.empId,
+    firstName: answers2.firstName,
+    lastName: answers2.lastName,
+    roleId: answers2.roleId,
+    mgrId: answers2.mgrId
+  };
+  // console.log(params);
+  const sqlResults = await connex2db.sqlUpdOneEmp(params);
+  console.table("== Employee Updated Before ==", preChange);
+  console.table("== Employee Updated After ==", params);
+  console.table(sqlResults[0]);
+  
+  updatePrompt();
 };
  
 // DELETE ##################################
@@ -496,34 +632,27 @@ const deletePrompt = async () => {
     // choices: ["Department", "DONE"]
   },
   ]; 
-  const { action } = await inquirer.prompt(query)
-  // await inquirer
-  //   .prompt(query)
-    // .then((answers) => {
-      console.log("inside deletePrompt .then");
-      console.log(action);
-      switch (action) {
-        case "Department":
-          deleteDepartment();
-          break;
-        case "Role":
-          deleteRole();
-          break;
-        case "Employee":
-          deleteEmployee();
-          break;
-        case "QUIT DELETE":
-          console.log("Return to main query");
-          employeeTracker();
-          break;
-        default:
-          console.log("Default deletePrompt Task")
-          break;
-      }
-    // })
-    // .catch((err) =>
-    //   err ? console.log(err) : console.log(`Successful deletePrompt`)
-    // );
+  const { action } = await inquirer.prompt(query);
+  // console.log("inside deletePrompt .then");
+  // console.log(action);
+  switch (action) {
+    case "Department":
+      deleteDepartment();
+      break;
+    case "Role":
+      deleteRole();
+      break;
+    case "Employee":
+      deleteEmployee();
+      break;
+    case "QUIT DELETE":
+      console.log("Return to main query");
+      employeeTracker();
+      break;
+    default:
+      console.log("Default deletePrompt Task")
+      break;
+  };
 };
  
 deleteDepartment = () => {
