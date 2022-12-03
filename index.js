@@ -38,7 +38,7 @@ const employeeTracker = async () => {
       deletePrompt();
       break;
     case "QUIT Employee Tracker\n":
-      console.log("QUIT Employee Tracker\n");
+      // console.log("QUIT Employee Tracker\n");
       process.exit(0);
       return;
     default:
@@ -93,7 +93,7 @@ const viewPrompt = async () => {
       viewBudgetByDept();
       break;
     case "QUIT VIEW Menu":
-      console.log("Return to main query");
+      // console.log("Return to main query");
       employeeTracker();
       break;
     default:
@@ -184,7 +184,7 @@ const addPrompt = async () => {
       addEmployee();
       break;
     case "QUIT ADD Menu":
-      console.log("Return to main query");
+      // console.log("Return to main query");
       employeeTracker();
       break;
     default:
@@ -370,7 +370,7 @@ const updatePrompt = async () => {
       updateEmployee();
       break;
     case "QUIT UPDATE Menu":
-      console.log("Return to main query");
+      // console.log("Return to main query");
       employeeTracker();
       break;
     default:
@@ -668,7 +668,7 @@ const deletePrompt = async () => {
       deleteEmployee();
       break;
     case "QUIT DELETE Menu":
-      console.log("Return to main query");
+      // console.log("Return to main query");
       employeeTracker();
       break;
     default:
